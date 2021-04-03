@@ -4,11 +4,23 @@ on:
     branches: [ master ]
 
 jobs:
-  docker:
+  buid-test-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Install python3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install poentry
+        uses: Gr1N/setup-poetry@v4
+        with:
+          poetry-version: 1.0.0
+          
+      - run: poetry run pytest
 
       - name: Login Docker Hub
         uses: docker/login-action@v1
