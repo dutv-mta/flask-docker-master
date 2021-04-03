@@ -40,4 +40,4 @@ jobs:
           cache-to: type=local,src=/tmp/.buildx-cache
 
       - name: Verify
-        run: ehco ${{ step.docker_build.outputs.digest }}
+        run: ehco ${{ steps.docker_build.outputs.digest }}
