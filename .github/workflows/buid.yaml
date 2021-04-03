@@ -1,0 +1,11 @@
+name: flask-docker-master
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
