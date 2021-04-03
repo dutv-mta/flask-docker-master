@@ -34,6 +34,7 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME}}/flask-docker:latest
           cache-from: type=local,src=/tmp/.buildx-cache
