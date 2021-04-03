@@ -16,11 +16,15 @@ jobs:
           python-version: 3.8
 
       - name: Install poentry
-        uses: Gr1N/setup-poetry@v4
+        uses: snok/install-poetry@v1.1.2
         with:
-          poetry-version: 1.0.0
-          
-      - run: poetry run pytest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Run test
+        run: |
+          source .venv/bin/activate
+          pytest tests/
 
       - name: Login Docker Hub
         uses: docker/login-action@v1
