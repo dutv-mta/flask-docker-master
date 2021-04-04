@@ -1,0 +1,65 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@1.4.0
+
+jobs:
+  build-and-test:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run: pip install virtualenv --user
+      - run:
+          command: |
+            /usr/local/bin/virtualenv ~/.venv/dutv
+            . ~/.venv/dutv/bin/activate
+            pip install poetry
+            pip install -U Flask
+            pip install pytest
+      - run: 
+          command: |
+            . ~/.venv/dutv/bin/activate
+            pytest tests/
+  build-and-push:
+    environment:
+      DOCKERHUB_IMAGE: dutvmta/flask-docker
+      DOCKERHUB_TAG: latest
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check:
+          docker-username: DOCKERHUB_USERNAME
+          docker-password: DOCKERHUB_ACCESS_TOKEN
+      - docker/build:
+          image: $DOCKERHUB_IMAGE
+          tag: $DOCKERHUB_TAG
+      - docker/push:
+          digest-path: /tmp/digest.txt
+          image: $DOCKERHUB_IMAGE
+          tag: $DOCKERHUB_TAG
+      - run: |
+          echo "Digest is: $(</tmp/digest.txt)"
+    
+  deploy:
+    executor: docker/docker
+    steps:
+      - run:
+          command: |
+            ssh -oStrictHostKeyChecking=no $DEPLOYED_USER@$DEPLOYED_SERVER 'cd ~/flask-docker && ./deploy.sh'
+
+workflows:
+  my-pipeline:
+    jobs:
+      - build-and-test
+      - build-and-push:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - master
+      - deploy:
+          requires:
+            - build-and-push
