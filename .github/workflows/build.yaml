@@ -2,7 +2,7 @@ name: flask-docker-master
 on: [ push, pull_request ]
 
 jobs:
-  buid-test-push:
+  buid-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,6 +38,11 @@ jobs:
           source .venv/bin/activate
           pytest tests/
 
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: buid-and-test
+    steps:
       - name: Login Docker Hub
         uses: docker/login-action@v1
         with: 
@@ -70,3 +75,16 @@ jobs:
 
       - name: Verify
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: build-and-push
+    steps:
+      - name: Deploy code to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.SSHKEY }}
+          script: cd ~/flask-docker && ./deploy.sh
