@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: flask-docker-master
+  annotations:
+    github.com/project-slug: dutv-mta/flask-docker-master
+spec:
+  type: other
+  lifecycle: unknown
+  owner: dutv-mta
