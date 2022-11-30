@@ -6,5 +6,5 @@ metadata:
     github.com/project-slug: dutv-mta/flask-docker-master
 spec:
   type: service
-  lifecycle: unknown
+  lifecycle: experimental
   owner: dutv-mta
